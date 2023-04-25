@@ -1,0 +1,295 @@
+local HttpService = game:GetService("HttpService")
+local Workspace = game:GetService("Workspace")
+local Replicated = game:GetService("ReplicatedStorage")
+local plr = game:GetService("Players").LocalPlayer
+local RunService = game:GetService("RunService")
+local mouse = game.Players.LocalPlayer:GetMouse()
+local UserInputService = game:GetService("UserInputService")
+local exec = tostring(identifyexecutor())
+local vu = game:GetService("VirtualUser")
+
+local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Rayfield/main/source'))()
+local Window = Rayfield:CreateWindow({
+	Name = "Bonzo Hub | Anime Adventures Addons",
+	LoadingTitle = "Bonzo Hub is loading...",
+	LoadingSubtitle = "by 1hz",
+	ConfigurationSaving = {
+	   Enabled = true,
+	   FolderName = nil, -- Create a custom folder for your hub/game
+	   FileName = "BonzoHub"
+	},
+	Discord = {
+	   Enabled = false,
+	   Invite = "Svwwk6rwe4", -- The Discord invite code, do not include discord.gg/. E.g. discord.gg/ABCD would be ABCD
+	   RememberJoins = false -- Set this to false to make them join the discord every time they load it up
+	},
+	KeySystem = true, -- Set this to true to use our key system
+	KeySettings = {
+	   Title = "Verification",
+	   Subtitle = "Enter the key",
+	   Note = "Check discord for the key (Click bottom right or button below to join!)",
+	   FileName = "BonzoKey", -- It is recommended to use something unique as other scripts using Rayfield may overwrite your key file
+	   SaveKey = true, -- The user's key will be saved, but if you change the key, they will be unable to use your script
+	   GrabKeyFromSite = true, -- If this is true, set Key below to the RAW site you would like Rayfield to get the key from
+	   Key = "https://pastebin.com/raw/Km8LSwHh" -- List of keys that will be accepted by the system, can be RAW file links (pastebin, github etc) or simple strings ("hello","key22")
+	}
+ })
+
+getgenv().SpecialBannerWebhook = true
+getgenv().StandardBannerWebhook = true
+getgenv().AntiAFK = true
+getgenv().WebhookURL = Value
+getgenv().Delay = Value
+getgenv().AutoAbilityToggle = true
+
+-- Windows and Tabs
+
+
+-- Info Tab
+local InfoTab = Window:CreateTab("Info", 4483362458) -- Title, Image
+local Paragraph = InfoTab:CreateParagraph({Title = "About the Script", Content = "Bonzo Hub is a small script hub and is not supposed to be super advanced right now. Features are mainly to provide basic quality of life functions for games the developer plays"})
+local Paragraph = InfoTab:CreateParagraph({Title = "Credits", Content = "Developer - 1hz#8290\nFriends - Aet#1270, Kaifuku#7145"})
+local Paragraph = InfoTab:CreateParagraph({Title = "Changelog", Content = "[+] Send Units in Special Banner Webhook\n[+] Send Units in Standard Banner Webhook\n[+] Auto Deposit Easter Eggs\n[+] Auto Claim Mystery Eggs"})
+local Button = InfoTab:CreateButton({
+	Name = "Copy discord invite link",
+	Callback = function()
+        setclipboard("https://discord.gg/Svwwk6rwe4")
+	end,
+ })
+
+-- Main Tab
+local MainTab = Window:CreateTab("Main", 4483362458) -- Title, Image
+
+-- Configs
+
+-- Main Features
+
+local Section = MainTab:CreateSection("Gameplay")
+
+local Toggle = MainTab:CreateToggle({
+	Name = "Auto Wendy",
+	CurrentValue = false,
+	Flag = "Toggle3", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+	Callback = function(Value)
+		getgenv().AutoAbilityToggle = Value
+		AutoWendyFunction()
+	end,
+})
+
+local Section = MainTab:CreateSection("Webhooks")
+
+local Input = MainTab:CreateInput({
+	Name = "Webhook URL",
+	PlaceholderText = "Your webhook URL",
+	RemoveTextAfterFocusLost = false,
+	Callback = function(Text)
+		getgenv().WebhookURL = Text
+	end,
+ })
+
+ local Input = MainTab:CreateInput({
+	Name = "Sending Delay",
+	PlaceholderText = "Time in seconds",
+	RemoveTextAfterFocusLost = false,
+	Callback = function(Text)
+		getgenv().Delay = Text
+	end,
+ })
+
+local Toggle = MainTab:CreateToggle({
+	Name = "Send Special Banner",
+	CurrentValue = false,
+	Flag = "Toggle1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+	Callback = function(Value)
+		getgenv().SpecialBannerWebhook = Value
+		SpecialSummonSniperWebhook()
+	end,
+})
+
+local Toggle = MainTab:CreateToggle({
+	Name = "Send Standard Banner",
+	CurrentValue = false,
+	Flag = "Toggle2", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+	Callback = function(Value)
+		getgenv().StandardSummonSniperWebhook = Value
+		StandardSummonSniperWebhook()
+	end,
+ })
+
+
+ 
+local Section = MainTab:CreateSection("Easter Eggs")
+
+local Button = MainTab:CreateButton({
+	Name = "Auto Claim & Redeem Easter Eggs",
+	Callback = function()
+        ClaimFeedEgg()
+	end,
+ })
+
+-- Functions
+
+
+-- Start of Auto Ability function
+
+function AutoWendyFunction()
+    local player = game.Players.LocalPlayer.Name
+    while getgenv().AutoAbilityToggle == true do
+        repeat task.wait() until Workspace:WaitForChild("_UNITS")
+            for i, v in ipairs(Workspace["_UNITS"]:GetChildren()) do
+                if v:FindFirstChild("_stats") then
+				elseif v._stats:FindFirstChild("player") then
+					if tostring(v._stats.player.Value) == player then
+					if v._stats.id.Value == "wendy" or v._stats.id.Value == "erwin" then
+						game:GetService("ReplicatedStorage").endpoints.client_to_server.use_active_attack:InvokeServer(v)
+						task.wait(21)
+					end
+				end
+			end
+		end
+	end
+end
+-- End of Auto Ability function
+
+-- Start of anti afk function
+
+local vu = game:GetService("VirtualUser")
+game:GetService("Players").LocalPlayer.Idled:connect(function()
+   vu:Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+   wait(1)
+   vu:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+end)
+
+-- End of anti afk function
+
+-- Start of auto claim egg function
+function ClaimFeedEgg()
+    if getgenv().AutoClaimFeedEgg then
+        if game.Workspace.EasterArea:FindFirstChild("leaderboard") then
+        eggs = {"easter_egg_1","easter_egg_2","easter_egg_3","easter_egg_4","easter_egg_5","easter_egg_6"}
+            for _, v in pairs(eggs) do
+                game:GetService("ReplicatedStorage").endpoints["client_to_server"]["feed_easter_meter"]:InvokeServer(v)
+            end
+            game:GetService("ReplicatedStorage").endpoints["client_to_server"]["claim_easter_meter"]:InvokeServer()
+        end
+    end
+end
+-- End of auto claim egg function
+
+-- Start of special banner function
+function SpecialSummonSniperWebhook()
+	while getgenv().SpecialBannerWebhook == true do
+	local url = getgenv().WebhookURL
+        local Time = os.date('!*t', OSTime);
+	    local thumbnails_avatar = HttpService:JSONDecode(game:HttpGet("https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=" .. game:GetService("Players").LocalPlayer.UserId .. "&size=150x150&format=Png&isCircular=true", true))
+        special_banner = game:GetService("Players").LocalPlayer.PlayerGui.HatchGuiNew.BannerFrames.EventClover.Main
+        units = {
+            special_banner["Featured_One"],
+            special_banner["Featured_Two"],
+            special_banner["Featured_Three"]
+        }
+        unitNamesForJson = {
+            special_banner["Featured_One"].name.Text,
+            special_banner["Featured_Two"].name.Text,
+            special_banner["Featured_Three"].name.Text
+        }
+		local data = {
+            ["content"] = "",
+                ["username"] = "AA Hub",
+                ["avatar_url"] = "https://cdn.discordapp.com/attachments/1001162464639066245/1098880359485153340/unique.png",
+                ["embeds"] = {
+                    {
+                        ["author"] = {
+                            ["name"] = " Special Banner ",
+                            ["icon_url"] = "https://cdn.discordapp.com/emojis/997123585476927558.webp?size=96&quality=lossless"
+                        },
+                        ["color"] = 000000,
+                        ["timestamp"] = string.format('%d-%d-%dT%02d:%02d:%02dZ', Time.year, Time.month, Time.day, Time.hour, Time.min, Time.sec),
+                        ["fields"] = {
+                            {
+                                ["name"] = "```" .. units[1].name.Text .. "```",
+                                ["value"] = "```(" .. units[1].Rarity.Text .. ") [Featured]```",
+                                ["inline"] = true
+                            },
+                            {
+                                ["name"] = "```" .. units[2].name.Text .. "```",
+                                ["value"] = "```(" .. units[2].Rarity.Text .. ")```",
+                                ["inline"] = true
+                            },
+                            {
+                                ["name"] = "```" .. units[3].name.Text .. "```",
+                                ["value"] = "```(" .. units[3].Rarity.Text .. ")```",
+                                ["inline"] = true
+                            }
+                        }
+                    }
+                }
+            }
+        local xd = game:GetService("HttpService"):JSONEncode(data)
+        local headers = {["content-type"] = "application/json"}
+        request = http_request or request or HttpPost or syn.request or http.request
+        local sex = {Url = url, Body = xd, Method = "POST", Headers = headers}
+        warn("Sending special banner webhook notification...")
+        request(sex)
+		wait(getgenv().Delay)
+    end
+end
+-- End of special banner function
+
+-- Start of standard banner function
+function StandardSummonSniperWebhook()
+	while getgenv().StandardSummonSniperWebhook == true do
+	local url = getgenv().WebhookURL
+		local Time = os.date('!*t', OSTime);
+		local thumbnails_avatar = HttpService:JSONDecode(game:HttpGet("https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=" .. game:GetService("Players").LocalPlayer.UserId .. "&size=150x150&format=Png&isCircular=true", true))
+		units = {
+			game:GetService("Players").LocalPlayer.PlayerGui.HatchGuiNew.BannerFrames.Standard.Main.Scroll["1"].Main,
+			game:GetService("Players").LocalPlayer.PlayerGui.HatchGuiNew.BannerFrames.Standard.Main.Scroll["2"].Main,
+			game:GetService("Players").LocalPlayer.PlayerGui.HatchGuiNew.BannerFrames.Standard.Main.Scroll["3"].Main,
+			game:GetService("Players").LocalPlayer.PlayerGui.HatchGuiNew.BannerFrames.Standard.Main.Scroll["4"].Main,
+			game:GetService("Players").LocalPlayer.PlayerGui.HatchGuiNew.BannerFrames.Standard.Main.Scroll["5"].Main,
+			game:GetService("Players").LocalPlayer.PlayerGui.HatchGuiNew.BannerFrames.Standard.Main.Scroll["6"].Main
+		}
+			UP1 = units[1].petimage.WorldModel:GetChildren()[1].Name
+			UP2 = units[2].petimage.WorldModel:GetChildren()[1].Name
+			UP3 = units[3].petimage.WorldModel:GetChildren()[1].Name
+			UP4 = units[4].petimage.WorldModel:GetChildren()[1].Name
+			UP5 = units[5].petimage.WorldModel:GetChildren()[1].Name
+			UP6 = units[6].petimage.WorldModel:GetChildren()[1].Name
+		local data = {
+			["content"] = "",
+				["username"] = "AA Hub",
+				["avatar_url"] = "https://cdn.discordapp.com/attachments/1001162464639066245/1098880359485153340/unique.png",
+				["embeds"] = {
+					{
+						["author"] = {
+							["name"] = " Standard Banner ",
+							["icon_url"] = "https://cdn.discordapp.com/emojis/997123585476927558.webp?size=96&quality=lossless"
+						},
+						["color"] = 000000,
+						["timestamp"] = string.format('%d-%d-%dT%02d:%02d:%02dZ', Time.year, Time.month, Time.day, Time.hour, Time.min, Time.sec),
+						["fields"] = {
+
+						}
+					}
+				}
+			}
+		for i, unit in pairs(units) do
+			unit_stats = {
+				["name"] = "```" .. unit.petimage.WorldModel:GetChildren()[1].Name .."```",
+				["value"] = "```(" ..unit.Rarity.Text ..")```",
+				["inline"] = true
+			}
+			table.insert(data["embeds"][1]["fields"], unit_stats)
+		end
+			local xd = game:GetService("HttpService"):JSONEncode(data)
+	
+			local headers = {["content-type"] = "application/json"}
+			request = http_request or request or HttpPost or syn.request or http.request
+			local sex = {Url = url, Body = xd, Method = "POST", Headers = headers}
+			warn("Sending Standard banner webhook notification...")
+			request(sex)
+			wait(getgenv().Delay)
+		end
+	end
+-- End of standard banner function
